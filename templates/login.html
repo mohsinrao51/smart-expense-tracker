@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Expense Tracker - Login</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="login-page">
+<div class="container">
+
+    <div class="row justify-content-center align-items-center vh-100">
+
+        <div class="col-md-5">
+
+            <div class="card shadow p-4">
+
+                <h2 class="text-center mb-4">
+                    Smart Expense Tracker
+                </h2>
+
+                <p class="text-center text-muted">
+                    Please login to continue
+                </p>
+
+                <form method="POST">
+
+                    <input
+                        class="form-control mb-3"
+                        type="email"
+                        name="email"
+                        placeholder="Enter your Email"
+                        required>
+
+                    <input
+                        class="form-control mb-3"
+                        type="password"
+                        name="password"
+                        placeholder="Enter your Password"
+                        required>
+
+                    <button
+                        type="submit"
+                        class="btn btn-success w-100">
+                        Login
+                    </button>
+
+                </form>
+
+                {% if error %}
+                <div class="alert alert-danger mt-3">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <hr>
+
+                <p class="text-center">
+                    Don't have an account?
+                    <a href="/register-ui">Register</a>
+                </p>
+
+                <p class="text-center">
+                    <a href="/forgot-password">
+                        Forgot Password?
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

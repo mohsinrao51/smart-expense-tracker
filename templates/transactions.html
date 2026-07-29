@@ -1,0 +1,188 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Expense Tracker - Transactions</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="transactions-page">
+
+<div class="container mt-5">
+
+    <!-- Header -->
+
+    <div class="d-flex justify-content-between mb-4">
+
+        <h2>Transactions</h2>
+
+        <div>
+            <a href="/dashboard-ui"
+               class="btn btn-secondary">
+                Dashboard
+            </a>
+
+            <a href="/logout"
+               class="btn btn-danger">
+                Logout
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Summary Cards -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card shadow p-3">
+                <h5>Total Income</h5>
+                <h3>PKR {{ income }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow p-3">
+                <h5>Total Expense</h5>
+                <h3>PKR {{ expense }}</h3>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow p-4 border border-3">
+                <h4>Current Balance</h4>
+                <h1>PKR {{ balance }}</h1>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add Transaction Form -->
+
+    <div class="card shadow p-4 mb-4">
+
+        <h4 class="mb-3">Add Transaction</h4>
+
+        <form method="POST">
+
+            <div class="mb-3">
+                <label>Type</label>
+
+                <select name="type"
+                        class="form-control"
+                        required>
+
+                    <option value="income">
+                        Income
+                    </option>
+
+                    <option value="expense">
+                        Expense
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Amount</label>
+
+                <input
+                    type="number"
+                    name="amount"
+                    class="form-control"
+                    required>
+            </div>
+
+            <div class="mb-3">
+                <label>Category</label>
+
+                <input
+                    type="text"
+                    name="category"
+                    class="form-control"
+                    required>
+            </div>
+
+            <div class="mb-3">
+                <label>Description (Optional)</label>
+
+                <input
+                    type="text"
+                    name="description"
+                    class="form-control">
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+                Add Transaction
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- Transactions Table -->
+
+    <div class="card shadow p-4">
+
+        <h4 class="mb-3">
+            All Transactions
+        </h4>
+
+        {% if transactions %}
+
+        <table class="table table-striped">
+
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date & Time</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for txn in transactions %}
+
+                <tr>
+                    <td>{{ txn.type }}</td>
+                    <td>PKR {{ txn.amount }}</td>
+                    <td>{{ txn.category }}</td>
+
+                    <td>
+                        {{ txn.date.strftime('%d-%b-%Y %I:%M %p') }}
+                    </td>
+
+                    <td>{{ txn.description }}</td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <p class="text-muted">
+            No transactions found.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
+```
+
