@@ -1,162 +1,409 @@
+/* ==========================================================================
+   Smart Expense Tracker — Ledger Design System
+   One shared stylesheet for every page (login, register, dashboard,
+   transactions, reports). Deliberately page-agnostic: the old file gave
+   each page its own gradient theme, which is why the app felt like it
+   was changing identity from screen to screen. This file removes that —
+   same paper background, same header, same card/table/button language
+   everywhere. The per-page body classes (.login-page etc.) are kept in
+   the HTML for hooks, but no longer carry different colors.
+   ========================================================================== */
 
-body {
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --paper: #EDEAE9;
+    --card: #F8F6F2;
+    --ink: #1C2B24;
+    --ink-soft: #5B6760;
+    --ledger: #2F4739;
+    --ledger-dark: #22352A;
+    --brass: #B08D3E;
+    --brass-soft: #EFE6CE;
+    --rust: #A3402B;
+    --rust-soft: #F3DFD8;
+    --line: #C9C2AE;
+    --line-soft: #DEDACB;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+html, body {
+    background: var(--paper) !important;
+    color: var(--ink);
+    font-family: var(--font-body);
     min-height: 100vh;
-    background: linear-gradient(
-        135deg,
-        #667eea 0%,
-        #764ba2 100%
-    );
-    font-family: Arial, sans-serif;
 }
 
-.glass-card {
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+/* Neutralize the old per-page gradients — every page shares one
+   background now, just a faint ruled-paper texture. */
+.login-page, .register-page, .dashboard-page,
+.transactions-page, .reports-page {
+    background: var(--paper) !important;
+    background-image: linear-gradient(var(--line-soft) 1px, transparent 1px) !important;
+    background-size: 100% 2.6rem !important;
+    background-attachment: fixed !important;
+}
 
-    border: 1px solid rgba(255, 255, 255, 0.2);
+h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    color: var(--ink);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
 
-    border-radius: 20px;
+p, span, label, td, th, li, a {
+    font-family: var(--font-body);
+}
 
+a { color: var(--ledger); }
+a:hover { color: var(--ledger-dark); }
+
+hr { border-color: var(--line-soft); opacity: 1; }
+
+/* ---- Letterhead / page header bar (dashboard, transactions, reports) ---- */
+
+.container > .d-flex.justify-content-between {
+    position: relative;
+    background: linear-gradient(155deg, #43664F 0%, var(--ledger) 45%, var(--ledger-dark) 100%);
+    color: var(--paper);
+    padding: 1.5rem 2rem;
+    border-radius: 4px;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    width: calc(100% + 1rem);
     box-shadow:
-        0 8px 32px rgba(31, 38, 135, 0.37);
-
-    color: white;
-}
-
-.glass-card h2,
-.glass-card h4,
-.glass-card h5,
-.glass-card p {
-    color: white;
-}
-
-.form-control {
-    border-radius: 12px;
-    padding: 12px;
-}
-
-.btn {
-    border-radius: 12px;
-    transition: 0.3s;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-}
-
-.summary-card {
-    border-radius: 20px;
-    box-shadow:
-        0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.balance-card {
-    background: rgba(255, 255, 255, 0.25);
-
-    backdrop-filter: blur(20px);
-
-    border-radius: 20px;
-
-    color: white;
-}
-
-.balance-card h1 {
-    font-size: 48px;
-    font-weight: bold;
-}
-
-.nav-btn {
-    margin-left: 10px;
-}
-
-.table {
-    background: white;
-    border-radius: 15px;
+        0 6px 16px rgba(28, 43, 36, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
     overflow: hidden;
 }
 
-.table th {
-    font-size: 15px;
+/* Diagonal glass shine sweeping across the header */
+.container > .d-flex.justify-content-between::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    left: -20%;
+    width: 60%;
+    height: 220%;
+    background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.10) 45%,
+        rgba(255, 255, 255, 0) 60%
+    );
+    transform: rotate(8deg);
+    pointer-events: none;
 }
 
-.table td {
+.container > .d-flex.justify-content-between h2 {
+    color: var(--paper);
+    font-size: 1.9rem;
+    margin-bottom: 0.15rem;
+}
+
+.container > .d-flex.justify-content-between .text-muted {
+    color: #C7D2C9 !important;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+}
+
+/* ---- Buttons ---- */
+
+.btn {
+    position: relative;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 0.55rem 1.15rem;
+    border: 1px solid transparent;
+    box-shadow:
+        0 2px 4px rgba(28, 43, 36, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+    box-shadow:
+        0 4px 8px rgba(28, 43, 36, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.btn:active { transform: translateY(0); filter: brightness(0.97); }
+.btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* Buttons inside the dark letterhead header need light outlines */
+.container > .d-flex.justify-content-between .btn-secondary {
+    background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02));
+    border-color: rgba(237, 234, 233, 0.5);
+    color: var(--paper);
+}
+.container > .d-flex.justify-content-between .btn-secondary:hover {
+    background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05));
+    color: var(--paper);
+}
+
+.container > .d-flex.justify-content-between .btn-danger {
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+    border-color: rgba(237, 234, 233, 0.5);
+    color: #E7B6A8;
+}
+.container > .d-flex.justify-content-between .btn-danger:hover {
+    background: linear-gradient(180deg, rgba(163, 64, 43, 0.35), rgba(163, 64, 43, 0.18));
+    color: #F3DFD8;
+}
+
+.container > .d-flex.justify-content-between .btn-primary,
+.container > .d-flex.justify-content-between .btn-success {
+    background: linear-gradient(180deg, #C9A455 0%, var(--brass) 55%, #9c7b34 100%);
+    border-color: #9c7b34;
+    color: var(--ledger-dark);
+}
+.container > .d-flex.justify-content-between .btn-primary:hover,
+.container > .d-flex.justify-content-between .btn-success:hover {
+    background: linear-gradient(180deg, #D9BC72 0%, #C9A455 55%, #9c7b34 100%);
+    border-color: #9c7b34;
+    color: var(--ledger-dark);
+}
+
+/* Buttons in normal page flow (forms, cards) */
+.btn-primary {
+    background: linear-gradient(180deg, #47694F 0%, var(--ledger) 55%, var(--ledger-dark) 100%);
+    border-color: var(--ledger-dark);
+    color: var(--paper);
+}
+.btn-primary:hover {
+    background: linear-gradient(180deg, #517659 0%, #385643 55%, var(--ledger-dark) 100%);
+    border-color: var(--ledger-dark);
+}
+
+.btn-success {
+    background: linear-gradient(180deg, #47694F 0%, var(--ledger) 55%, var(--ledger-dark) 100%);
+    border-color: var(--ledger-dark);
+    color: var(--paper);
+}
+.btn-success:hover {
+    background: linear-gradient(180deg, #517659 0%, #385643 55%, var(--ledger-dark) 100%);
+    border-color: var(--ledger-dark);
+}
+
+.btn-dark {
+    background: linear-gradient(180deg, var(--card), #EFECE5);
+    border: 1px solid var(--ledger);
+    color: var(--ledger);
+}
+.btn-dark:hover {
+    background: linear-gradient(180deg, #385643, var(--ledger));
+    color: var(--paper);
+}
+
+/* ---- Cards ---- */
+
+.card {
+    background: linear-gradient(165deg, #FFFFFF 0%, var(--card) 45%, #F1EEE7 100%) !important;
+    border: 1px solid var(--line-soft) !important;
+    border-radius: 6px !important;
+    box-shadow:
+        0 4px 12px rgba(28, 43, 36, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+    color: var(--ink) !important;
+}
+
+.card:hover { transform: none; }
+
+.card h4, .card h5 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft) !important;
+    font-family: var(--font-body);
+    font-weight: 600;
+}
+
+.card h3, .card h1 {
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+
+/* ---- Summary cards: Income / Expense / Balance ---- */
+/* Explicit classes (added in the HTML) instead of nth-child, so
+   these work regardless of column layout on a given page. */
+
+.card-income h3 { color: var(--ledger) !important; }
+.card-expense h3 { color: var(--rust) !important; }
+
+/* Balance card — the app's one signature element: a stamped seal,
+   now with a glassy highlight and diagonal shine. */
+.card-balance {
+    position: relative;
+    background: radial-gradient(circle at 28% 22%, #4B7059 0%, var(--ledger) 55%, var(--ledger-dark) 100%) !important;
+    border-color: var(--ledger-dark) !important;
+    text-align: center;
+    overflow: hidden;
+    box-shadow:
+        0 6px 18px rgba(28, 43, 36, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+.card-balance::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 1.5px dashed rgba(237, 234, 233, 0.35);
+    border-radius: 50% / 18%;
+    pointer-events: none;
+}
+.card-balance::after {
+    content: "";
+    position: absolute;
+    top: -80%;
+    left: -30%;
+    width: 55%;
+    height: 260%;
+    background: linear-gradient(
+        100deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.14) 45%,
+        rgba(255, 255, 255, 0) 60%
+    );
+    transform: rotate(12deg);
+    pointer-events: none;
+}
+.card-balance h4 { color: #C7D2C9 !important; }
+.card-balance h1, .card-balance .display-4 {
+    font-family: var(--font-mono);
+    color: var(--paper) !important;
+    font-size: 2.1rem;
+    letter-spacing: -0.02em;
+}
+.card-balance p { color: #C7D2C9 !important; font-size: 0.85rem; }
+
+/* ---- Auth pages (login / register) ---- */
+
+.login-page .card, .register-page .card {
+    max-width: 100%;
+}
+
+.login-page h2, .register-page h2 {
+    font-size: 1.7rem;
+}
+
+/* ---- Forms ---- */
+
+.form-label, form label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    font-weight: 500;
+    display: inline-block;
+    margin-bottom: 0.3rem;
+}
+
+.form-control {
+    background: linear-gradient(180deg, #E5E1D8, var(--paper));
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    padding: 0.6rem 0.75rem;
+    box-shadow: inset 0 1px 3px rgba(28, 43, 36, 0.08);
+}
+
+.form-control:focus {
+    background: linear-gradient(180deg, #EFEDE7, var(--card));
+    border-color: var(--ledger);
+    box-shadow:
+        inset 0 1px 3px rgba(28, 43, 36, 0.08),
+        0 0 0 3px rgba(47, 71, 57, 0.12);
+}
+
+.form-control::placeholder { color: var(--ink-soft); opacity: 0.6; }
+
+/* ---- Table (ledger rows, not stripes) ---- */
+
+.table {
+    background: transparent;
+    font-family: var(--font-body);
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    border-bottom: 2px solid var(--ledger);
+    border-top: none;
+    padding-bottom: 0.6rem;
+    background: transparent;
+}
+
+.table-striped > tbody > tr > * {
+    background: transparent !important;
+    box-shadow: none;
+}
+
+.table tbody td {
+    border-top: none;
+    border-bottom: 1px solid var(--line-soft);
+    padding: 0.75rem 0.5rem;
     vertical-align: middle;
 }
 
-.logo {
-    font-size: 32px;
-    font-weight: bold;
-    color: white;
+.table-hover tbody tr:hover td {
+    background: var(--brass-soft) !important;
 }
 
-.subtitle {
-    color: rgba(255, 255, 255, 0.8);
+.table td.amount-cell {
+    font-family: var(--font-mono);
+    font-weight: 500;
 }
 
-/* Page Themes */
-
-.login-page {
-    background:
-    linear-gradient(135deg,#4facfe,#00f2fe);
+.table td.txn-income {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--ledger);
 }
 
-.register-page {
-    background:
-    linear-gradient(135deg,#8E2DE2,#FF6FD8);
+.table td.txn-expense {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--rust);
 }
 
-.dashboard-page {
-    background:
-    linear-gradient(135deg,#141E30,#243B55);
+/* ---- Alerts ---- */
+
+.alert-danger {
+    background: var(--rust-soft);
+    border: 1px solid var(--rust);
+    color: var(--rust);
+    border-radius: 3px;
+    font-size: 0.9rem;
 }
 
-.transactions-page {
-    background:
-    linear-gradient(135deg,#11998e,#38ef7d);
+/* ---- Muted text ---- */
+
+.text-muted {
+    color: var(--ink-soft) !important;
 }
 
-.reports-page {
-    background:
-    linear-gradient(135deg,#f7971e,#ffd200);
-}
+/* ---- Container width polish ---- */
 
-/* Glass Effect */
-
-.glass-card {
-
-    background:
-    rgba(255,255,255,0.15);
-
-    backdrop-filter:
-    blur(15px);
-
-    border-radius:20px;
-
-    color:white;
-
-    box-shadow:
-    0 8px 32px rgba(0,0,0,0.2);
-}
-
-/* Summary Cards */
-
-.income-card{
-    background:#28a745;
-    color:white;
-}
-
-.expense-card{
-    background:#dc3545;
-    color:white;
-}
-
-.balance-card{
-    background:#ffc107;
-    color:black;
-}
-
-.card:hover{
-    transform:translateY(-5px);
-    transition:0.3s;
+.container.mt-5 {
+    max-width: 960px;
 }

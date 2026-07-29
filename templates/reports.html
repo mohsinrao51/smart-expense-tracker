@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,7 +20,7 @@
         <div>
             <h2>Financial Reports</h2>
             <p class="text-muted">
-                Generate Weekly, Monthly and Yearly Statements
+                Generate Weekly, Monthly, Yearly or Custom Date Statements
             </p>
         </div>
 
@@ -52,8 +51,15 @@
 
         <h4 class="mb-4">Generate Report</h4>
 
+        {% if error %}
+        <div class="alert alert-danger">
+            {{ error }}
+        </div>
+        {% endif %}
+
         <form method="POST"
-              action="/generate-report">
+              action="/generate-report"
+              id="report-form">
 
             <div class="mb-3">
 
@@ -63,22 +69,67 @@
 
                 <select
                     name="report_type"
+                    id="report_type"
                     class="form-control"
-                    required>
+                    required
+                    onchange="toggleCustomDates()">
 
-                    <option value="monthly">
+                    <option value="monthly"
+                        {% if report_type == 'monthly' or not report_type %}selected{% endif %}>
                         Monthly Report
                     </option>
 
-                    <option value="weekly">
+                    <option value="weekly"
+                        {% if report_type == 'weekly' %}selected{% endif %}>
                         Weekly Report
                     </option>
 
-                    <option value="yearly">
+                    <option value="yearly"
+                        {% if report_type == 'yearly' %}selected{% endif %}>
                         Yearly Report
                     </option>
 
+                    <option value="custom"
+                        {% if report_type == 'custom' %}selected{% endif %}>
+                        Custom Date Range
+                    </option>
+
                 </select>
+
+            </div>
+
+            <div class="row mb-3" id="custom-date-fields"
+                 style="display: {% if report_type == 'custom' %}flex{% else %}none{% endif %};">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Start Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="start_date"
+                        id="start_date"
+                        class="form-control"
+                        value="{{ start_date|default('') }}">
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        End Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="end_date"
+                        id="end_date"
+                        class="form-control"
+                        value="{{ end_date|default('') }}">
+
+                </div>
 
             </div>
 
@@ -103,7 +154,7 @@
 
         <div class="col-md-4">
 
-            <div class="card shadow p-3">
+            <div class="card shadow p-3 card-income">
 
                 <h5>Total Income</h5>
 
@@ -117,7 +168,7 @@
 
         <div class="col-md-4">
 
-            <div class="card shadow p-3">
+            <div class="card shadow p-3 card-expense">
 
                 <h5>Total Expense</h5>
 
@@ -131,7 +182,7 @@
 
         <div class="col-md-4">
 
-            <div class="card shadow p-4 border border-3">
+            <div class="card shadow p-4 border border-3 card-balance">
 
                 <h4>Current Balance</h4>
 
@@ -175,11 +226,11 @@
 
                 <tr>
 
-                    <td>
+                    <td class="{% if txn.type == 'income' %}txn-income{% else %}txn-expense{% endif %}">
                         {{ txn.type }}
                     </td>
 
-                    <td>
+                    <td class="amount-cell">
                         PKR {{ txn.amount }}
                     </td>
 
@@ -215,7 +266,18 @@
 
 </div>
 
+<script>
+    function toggleCustomDates() {
+        var reportType = document.getElementById("report_type").value;
+        var customFields = document.getElementById("custom-date-fields");
+
+        if (reportType === "custom") {
+            customFields.style.display = "flex";
+        } else {
+            customFields.style.display = "none";
+        }
+    }
+</script>
+
 </body>
 </html>
-```
-

@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,21 +44,21 @@
     <div class="row mb-4">
 
         <div class="col-md-3">
-            <div class="card shadow p-3">
+            <div class="card shadow p-3 card-income">
                 <h5>Total Income</h5>
                 <h3>PKR {{ income }}</h3>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card shadow p-3">
+            <div class="card shadow p-3 card-expense">
                 <h5>Total Expense</h5>
                 <h3>PKR {{ expense }}</h3>
             </div>
         </div>
 
         <div class="col-md-6">
-            <div class="card shadow p-4 border border-3">
+            <div class="card shadow p-4 border border-3 card-balance">
                 <h4>Current Balance</h4>
                 <h1 class="display-4">
                     PKR {{ balance }}
@@ -97,8 +96,10 @@
             {% for txn in transactions[-5:] %}
 
             <tr>
-                <td>{{ txn.type }}</td>
-                <td>PKR {{ txn.amount }}</td>
+                <td class="{% if txn.type == 'income' %}txn-income{% else %}txn-expense{% endif %}">
+                    {{ txn.type }}
+                </td>
+                <td class="amount-cell">PKR {{ txn.amount }}</td>
                 <td>{{ txn.category }}</td>
                 <td>{{ txn.date.strftime('%d-%b-%Y %I:%M %p') }}</td>
                 <td>{{ txn.description }}</td>
@@ -124,5 +125,3 @@
 
 </body>
 </html>
-```
-

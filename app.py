@@ -263,6 +263,11 @@ def generate_report():
 
     report_type = request.form["report_type"]
 
+    # Values echoed back to the template so the form
+    # keeps showing what the user selected/entered.
+    start_date_val = request.form.get("start_date", "")
+    end_date_val = request.form.get("end_date", "")
+
     data = list(
         transactions.find({"user_id": user_id})
     )
@@ -280,7 +285,12 @@ def generate_report():
     # Weekly
     elif report_type == "weekly":
 
-        seven_days = get_user_time() - timedelta(days=7)
+        # txn["date"] comes back from MongoDB as a naive UTC datetime
+        # (Mongo drops tzinfo on save), so this comparison value must
+        # also be naive UTC or Python raises a TypeError.
+        seven_days = (
+            get_user_time() - timedelta(days=7)
+        ).astimezone(pytz.utc).replace(tzinfo=None)
 
         data = [
             txn for txn in data
@@ -295,6 +305,72 @@ def generate_report():
         data = [
             txn for txn in data
             if txn["date"].year == current_year
+        ]
+
+    # Custom Date Range
+    elif report_type == "custom":
+
+        if not start_date_val or not end_date_val:
+            return render_template(
+                "reports.html",
+                transactions=[],
+                income=0,
+                expense=0,
+                balance=0,
+                report_type=report_type,
+                start_date=start_date_val,
+                end_date=end_date_val,
+                error="Please select both a start and end date."
+            )
+
+        tz = pytz.timezone(
+            session.get("timezone", "Asia/Karachi")
+        )
+
+        try:
+            # Build the range in the user's local timezone first,
+            # then convert to naive UTC to match how txn["date"] is
+            # actually stored/returned by MongoDB.
+            start_date = tz.localize(
+                datetime.strptime(start_date_val, "%Y-%m-%d")
+            ).astimezone(pytz.utc).replace(tzinfo=None)
+
+            # Include the entire end day (up to 23:59:59)
+            end_date = (
+                tz.localize(
+                    datetime.strptime(end_date_val, "%Y-%m-%d")
+                ) + timedelta(days=1, seconds=-1)
+            ).astimezone(pytz.utc).replace(tzinfo=None)
+
+        except ValueError:
+            return render_template(
+                "reports.html",
+                transactions=[],
+                income=0,
+                expense=0,
+                balance=0,
+                report_type=report_type,
+                start_date=start_date_val,
+                end_date=end_date_val,
+                error="Invalid date format."
+            )
+
+        if start_date > end_date:
+            return render_template(
+                "reports.html",
+                transactions=[],
+                income=0,
+                expense=0,
+                balance=0,
+                report_type=report_type,
+                start_date=start_date_val,
+                end_date=end_date_val,
+                error="Start date must be before end date."
+            )
+
+        data = [
+            txn for txn in data
+            if start_date <= txn["date"] <= end_date
         ]
 
     income = sum(
@@ -314,7 +390,10 @@ def generate_report():
         transactions=data,
         income=income,
         expense=expense,
-        balance=income-expense
+        balance=income-expense,
+        report_type=report_type,
+        start_date=start_date_val,
+        end_date=end_date_val
     )
 
 @app.route("/export-pdf")
