@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+ 
+scrape_configs:
+  - job_name: 'smart-expense-tracker'
+    metrics_path: /metrics
+    static_configs:
+      # localhost, not a container name — every container here runs
+      # with --network host, so they all share the host's network
+      # namespace and can reach each other via localhost.
+      - targets: ['localhost:5000']

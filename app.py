@@ -8,13 +8,26 @@ from datetime import datetime, timedelta
 from flask import send_file
 from reportlab.pdfgen import canvas
 import io
+import os
 import pytz
 import calendar
 from collections import defaultdict
+from prometheus_flask_exporter import PrometheusMetrics
 
 
 app = Flask(__name__)
-app.secret_key = "mohsin-secret-key"
+
+# Secret key and Mongo URI now come from environment variables so the
+# same image can run in dev, Docker, or any other environment without
+# code changes. The fallback values keep local `python app.py` runs
+# working exactly as before if no env vars are set.
+app.secret_key = os.environ.get("SECRET_KEY", "mohsin-secret-key")
+
+# Exposes GET /metrics in Prometheus text format — request counts,
+# latency histograms, and status codes per endpoint, with zero
+# per-route code changes needed elsewhere in this file.
+metrics = PrometheusMetrics(app)
+metrics.info("expense_tracker_app_info", "Smart Expense Tracker", version="1.0.0")
 
 def get_user_time():
     return datetime.now(
@@ -30,7 +43,10 @@ app.permanent_session_lifetime = timedelta(
 )
 
 # MongoDB Connection
-app.config["MONGO_URI"] = "mongodb://localhost:27017/expense_tracker"
+app.config["MONGO_URI"] = os.environ.get(
+    "MONGO_URI",
+    "mongodb://localhost:27017/expense_tracker"
+)
 
 mongo = PyMongo(app)
 
@@ -43,6 +59,17 @@ transactions = mongo.db.transactions
 @app.route("/")
 def home():
     return redirect("/login-ui")
+
+
+# Health check — used by Docker/Kubernetes to know the app (and its
+# Mongo connection) is actually up, not just that the process exists.
+@app.route("/health")
+def health():
+    try:
+        mongo.db.command("ping")
+        return jsonify({"status": "ok"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "detail": str(e)}), 503
 
 
 # Register User
