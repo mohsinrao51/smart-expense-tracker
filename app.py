@@ -9,6 +9,8 @@ from flask import send_file
 from reportlab.pdfgen import canvas
 import io
 import pytz
+import calendar
+from collections import defaultdict
 
 
 app = Flask(__name__)
@@ -212,13 +214,86 @@ def dashboard_ui():
         {"_id": ObjectId(user_id)}
     )
 
+    # ---- Category breakdown (for the coin wheel + ledger bars) ----
+    # Top 5 expense categories by amount; anything beyond that is
+    # folded into "Other" so the wheel never gets more slices than
+    # it can show cleanly.
+    category_totals = defaultdict(int)
+
+    for txn in data:
+        if txn["type"] == "expense":
+            category_totals[txn["category"]] += txn["amount"]
+
+    sorted_categories = sorted(
+        category_totals.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )
+
+    MAX_CATEGORIES = 5
+
+    top_categories = sorted_categories[:MAX_CATEGORIES]
+    other_total = sum(
+        amount for _, amount in sorted_categories[MAX_CATEGORIES:]
+    )
+
+    category_data = [
+        {"category": cat, "amount": amount}
+        for cat, amount in top_categories
+    ]
+
+    if other_total > 0:
+        category_data.append({"category": "Other", "amount": other_total})
+
+    category_total = sum(c["amount"] for c in category_data)
+
+    for c in category_data:
+        c["percent"] = round(
+            (c["amount"] / category_total * 100) if category_total else 0,
+            1
+        )
+
+    # ---- Monthly income vs expense trend (last 6 months) ----
+    now = get_user_time()
+
+    months = []
+    for i in range(5, -1, -1):
+        m = now.month - i
+        y = now.year
+        while m <= 0:
+            m += 12
+            y -= 1
+        months.append((y, m))
+
+    monthly_totals = {
+        month: {"income": 0, "expense": 0}
+        for month in months
+    }
+
+    for txn in data:
+        key = (txn["date"].year, txn["date"].month)
+        if key in monthly_totals:
+            monthly_totals[key][txn["type"]] += txn["amount"]
+
+    trend_data = [
+        {
+            "label": f"{calendar.month_abbr[m]} {y}",
+            "income": monthly_totals[(y, m)]["income"],
+            "expense": monthly_totals[(y, m)]["expense"]
+        }
+        for (y, m) in months
+    ]
+
     return render_template(
         "dashboard.html",
             name=user["name"],
             income=income,
             expense=expense,
             balance=income-expense,
-            transactions=data
+            transactions=data,
+            category_data=category_data,
+            category_total=category_total,
+            trend_data=trend_data
     )
 
 

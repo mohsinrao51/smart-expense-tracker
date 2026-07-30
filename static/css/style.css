@@ -25,6 +25,13 @@
     --line: #C9C2AE;
     --line-soft: #DEDACB;
 
+    --chart-1: #2F4739;
+    --chart-2: #A3402B;
+    --chart-3: #B08D3E;
+    --chart-4: #5B6760;
+    --chart-5: #7C9885;
+    --chart-6: #C9C2AE;
+
     --font-display: 'Fraunces', Georgia, serif;
     --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
     --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
@@ -407,3 +414,90 @@ hr { border-color: var(--line-soft); opacity: 1; }
 .container.mt-5 {
     max-width: 960px;
 }
+
+/* ---- Charts: coin wheel, ledger bars, trend legend ---- */
+
+.chart-card h4 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft) !important;
+}
+
+.coin-wheel-wrap {
+    position: relative;
+}
+
+.coin-wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    text-align: center;
+}
+
+.coin-wheel-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+}
+
+.coin-wheel-value {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--ink);
+}
+
+.ledger-bar-row {
+    margin-bottom: 0.9rem;
+}
+.ledger-bar-row:last-child {
+    margin-bottom: 0;
+}
+
+.ledger-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+    color: var(--ink);
+}
+
+.ledger-bar-track {
+    height: 8px;
+    background: var(--line-soft);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.ledger-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-bottom: 0.75rem;
+    align-items: center;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.legend-income { background: var(--brass); }
+.legend-expense { background: var(--rust); }

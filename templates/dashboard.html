@@ -71,6 +71,82 @@
 
     </div>
 
+    <!-- Spending Overview -->
+
+    <div class="row mb-4">
+
+        <div class="col-md-5">
+            <div class="card shadow p-4 chart-card">
+                <h4 class="mb-3">Category Breakdown</h4>
+
+                <div class="coin-wheel-wrap">
+                    <div style="position: relative; height: 200px;">
+                        <canvas id="categoryWheel"
+                                role="img"
+                                aria-label="Doughnut chart of expense breakdown by category">
+                            Expense breakdown by category.
+                        </canvas>
+                    </div>
+
+                    <div class="coin-wheel-center">
+                        <span class="coin-wheel-label">Total Spent</span>
+                        <span class="coin-wheel-value">PKR {{ category_total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow p-4 chart-card">
+                <h4 class="mb-3">Spending by Category</h4>
+
+                {% if category_data %}
+
+                {% for c in category_data %}
+                <div class="ledger-bar-row">
+                    <div class="ledger-bar-label">
+                        <span>{{ c.category }}</span>
+                        <span class="amount-cell">PKR {{ c.amount }}</span>
+                    </div>
+                    <div class="ledger-bar-track">
+                        <div class="ledger-bar-fill"
+                             style="width: {{ c.percent }}%; background: var(--chart-{{ loop.index }});"></div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% else %}
+                <p class="text-muted">No expenses recorded yet.</p>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col-12">
+            <div class="card shadow p-4 chart-card">
+                <h4 class="mb-3">Income vs Expense Trend</h4>
+
+                <div class="chart-legend">
+                    <span><span class="legend-dot legend-income"></span>Income</span>
+                    <span><span class="legend-dot legend-expense"></span>Expense</span>
+                </div>
+
+                <div style="position: relative; height: 260px;">
+                    <canvas id="trendChart"
+                            role="img"
+                            aria-label="Line chart of income and expense over the last six months">
+                        Monthly income and expense trend.
+                    </canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <div class="card shadow p-4">
 
         <h4 class="mb-3">
@@ -122,6 +198,90 @@
     </div>
 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+    var chartColors = ['#2F4739', '#A3402B', '#B08D3E', '#5B6760', '#7C9885', '#C9C2AE'];
+
+    var categoryLabels = {{ category_data | map(attribute='category') | list | tojson }};
+    var categoryAmounts = {{ category_data | map(attribute='amount') | list | tojson }};
+
+    if (categoryLabels.length > 0) {
+        new Chart(document.getElementById('categoryWheel'), {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryAmounts,
+                    backgroundColor: chartColors.slice(0, categoryLabels.length),
+                    borderColor: '#EDEAE9',
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    var trendLabels = {{ trend_data | map(attribute='label') | list | tojson }};
+    var trendIncome = {{ trend_data | map(attribute='income') | list | tojson }};
+    var trendExpense = {{ trend_data | map(attribute='expense') | list | tojson }};
+
+    new Chart(document.getElementById('trendChart'), {
+        type: 'line',
+        data: {
+            labels: trendLabels,
+            datasets: [
+                {
+                    label: 'Income',
+                    data: trendIncome,
+                    borderColor: '#B08D3E',
+                    backgroundColor: 'rgba(176, 141, 62, 0.12)',
+                    pointBackgroundColor: '#B08D3E',
+                    pointBorderColor: '#EDEAE9',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    borderWidth: 2,
+                    tension: 0.35,
+                    fill: true
+                },
+                {
+                    label: 'Expense',
+                    data: trendExpense,
+                    borderColor: '#A3402B',
+                    backgroundColor: 'rgba(163, 64, 43, 0.10)',
+                    pointBackgroundColor: '#A3402B',
+                    pointBorderColor: '#EDEAE9',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    borderWidth: 2,
+                    tension: 0.35,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#5B6760', font: { family: 'IBM Plex Sans' } }
+                },
+                y: {
+                    grid: { color: '#DEDACB' },
+                    ticks: { color: '#5B6760', font: { family: 'IBM Plex Mono' } }
+                }
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
